@@ -1,42 +1,91 @@
-# Nuxt 3 Minimal Starter
+# Nuxt3
 
-Look at the [nuxt 3 documentation](https://v3.nuxtjs.org) to learn more.
+## Directory structure
 
-## Setup
+## Assets Directory
 
-Make sure to install the dependencies:
+provide static assets for client-side
 
-```bash
-# yarn
-yarn install
+if you want to serve assets from the server, should taking a look at the **public** directory.
 
-# npm
-npm install
+## Components Directory
 
-# pnpm
-pnpm install --shamefully-hoist
+### auto import
+
+Nuxt automatically imports any components in your **components/**.
+
+### component names
+
+```
+| components/
+--| base/
+----| foo/
+------| Button.vue
 ```
 
-## Development Server
+the component's name will be:
 
-Start the development server on http://localhost:3000
-
-```bash
-npm run dev
+```
+<BaseFooButton />
 ```
 
-## Production
+### dynamic components
 
-Build the application for production:
+if you want to use the Vue **<component :is="component">** syntax, then you will need to use the **resolveComponent** helper provided by Vue.
 
-```bash
-npm run build
+```vue
+<template>
+  <component :is="clickable ? MyButton : 'div'" />
+</template>
+<script>
+const MyButton = resolveComponent("MyButton");
+</script>
 ```
 
-Locally preview production build:
+- globally(not recommended)
 
-```bash
-npm run preview
+register all your components globally.
+
+```ts
+export default defineNuxtConfig({
+  components: {
+    globally: true,
+    dirs: [
+      "~/components"
+      // or some components
+      "~/component/global"
+    ],
+  },
+});
 ```
 
-Checkout the [deployment documentation](https://v3.nuxtjs.org/guide/deploy/presets) for more information.
+> You can auto import for third library use the property(components) configure, but can't auto import style of component(recommended).
+
+### library authors
+
+You can use the **components:dir** hook to extend the directory list.
+
+## Composables Directory
+
+### auto import
+
+only scans files at the top level of the **Composables/** directory.
+
+### nested directories
+
+if you want to get auto imports working for nested modules, you could either re-export them from the **composables/index.ts** or configure the scanner to include nested directories.
+
+```ts
+// in composables/index.ts
+export {utils} form './nested/utils.ts'
+// configure nested directories
+export default defineNuxtConfig({
+  imports:{
+    dirs: [
+      'composables',
+      'composables/*/index.{ts,js,mjs,mts}',
+      'composables/**',
+    ]
+  }
+})
+```
