@@ -1,7 +1,6 @@
-<script setup lang="ts">
-const count = ref(0);
-</script>
-
 <template>
-  <NuxtPage />
+  <NuxtLayout>
+    some page content
+    <NuxtPage />
+  </NuxtLayout>
 </template>
